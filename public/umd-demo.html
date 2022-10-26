@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo</title>
+    <script src=""></script>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui@2.15.10/lib/index.js"></script>
+    <script src="https://unpkg.com/vue-virtual-scroll-list@2.3.4/dist/index.js"></script>
+    <script src="../dist/el-select2.umd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.10/lib/theme-chalk/index.css" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      Vue.component('el-select2', ElSelect2)
+      var App = Vue.extend({
+        template: '<el-select2 v-model="value" size="small" :options="options"></el-select2>',
+        data() {
+          return {
+            value: '',
+            options: []
+          }
+        },
+        created() {
+          const options = []
+          for (let i = 1; i < 1000; i++) {
+            if (i % 5 == 0) {
+              options.push({ value: i, label: '王五' + i })
+            } else if (i % 5 == 4) {
+              options.push({ value: i, label: '李四' + i })
+            } else if (i % 5 == 3) {
+              options.push({ value: i, label: '张三' + i })
+            } else {
+              options.push({ value: i, label: '小明' + i })
+            }
+          }
+          this.options = options
+        }
+      })
+      const app = new Vue({
+        el: '#app',
+        render: function (h) {
+          return h(App)
+        }
+      })
+    </script>
+  </body>
+</html>
