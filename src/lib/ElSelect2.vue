@@ -10,6 +10,7 @@
   >
     <template slot="empty">
       <virtual-list
+        v-if="list.length > 0"
         ref="list"
         style="height: 238px; overflow-y: auto"
         data-key="id"
@@ -22,6 +23,8 @@
         item-class="el-select-dropdown__item"
         :extra-props="{ onSelect, value }"
       />
+      <slot name="empty" v-else-if="$slots.empty" />
+      <p v-else class="el-select-dropdown__empty">{{ noDataText || '无数据' }}</p>
     </template>
   </el-select>
 </template>
@@ -31,10 +34,11 @@ import VirtualList from 'vue-virtual-scroll-list'
 import ElSelect2Item from './ElSelect2Item.vue'
 
 export default {
-  props: ['value', 'options', 'idKey', 'valueKey', 'labelKey'],
+  props: ['value', 'options', 'idKey', 'valueKey', 'labelKey', 'noDataText'],
   components: { 'virtual-list': VirtualList },
   data() {
     return {
+      keyword: '',
       itemComponent: ElSelect2Item
     }
   },
@@ -51,19 +55,31 @@ export default {
       })
       return props
     },
+    lowerCaseKeyword() {
+      return (this.keyword || '').toLowerCase()
+    },
     list() {
       const attr = this.$attrs // push 不触发computed重新计算，保证每次更新都触发计算 // TODO 优化
       const idKey = this.idKey
       const valueKey = this.valueKey || 'value'
       const labelKey = this.labelKey || 'label'
+      const keyword = this.lowerCaseKeyword
 
-      if (Array.isArray(this.options)) {
-        return this.options.map((item, idx) => {
-          const id = idKey ? item[idKey] : idx
-          return { id, label: item[labelKey], value: item[valueKey] }
-        })
+      if (!Array.isArray(this.options)) return []
+
+      const list = []
+      for (let i = 0; i < this.options.length; i++) {
+        const option = this.options[i]
+        const item = { id: idKey ? option[idKey] : i, label: option[labelKey], value: option[valueKey] }
+        if (!keyword) {
+          list.push(item)
+          continue
+        }
+        if (String(item.label).toLowerCase().indexOf(keyword) !== -1) {
+          list.push(item)
+        }
       }
-      return []
+      return list
     },
     label: {
       get() {
@@ -85,17 +101,21 @@ export default {
       this.$refs.select.blur()
     },
     onVisibleChange(val) {
+      this.keyword = ''
       this.$emit('visible-change', val)
-      if (!val) return
 
+      if (!val) return
       const idx = this.list.findIndex(item => {
         return item.value === this.value
       })
 
-      this.$nextTick(() => {
-        this.$refs.list.reset()
-        this.$refs.list.scrollToIndex(idx - 3 < 0 ? 0 : idx - 3) // 一页一共7个，停留在中间
-      })
+      if (this.$refs.list) {
+        this.$nextTick(() => {
+          const $list = this.$refs.list
+          $list && $list.reset()
+          $list && $list.scrollToIndex(idx - 3 < 0 ? 0 : idx - 3) // 一页一共7个，停留在中间
+        })
+      }
     },
     onBlur(e) {
       this.$emit('blur', e)
@@ -103,8 +123,8 @@ export default {
     onFocus(e) {
       this.$emit('focus', e)
     },
-    onFilter() {
-      // TODO
+    onFilter(kw) {
+      this.keyword = kw || ''
     }
   }
 }

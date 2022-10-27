@@ -55,9 +55,10 @@ export default {
   data() {
     return {
       value: 100,
-      size: 'default',
+      size: 'medium',
       disabled: false,
-      filterable: true
+      filterable: true,
+      options: []
     }
   },
   created() {
