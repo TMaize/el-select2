@@ -24,6 +24,7 @@
         :extra-props="{ onSelect, value }"
       />
       <slot name="empty" v-else-if="$slots.empty" />
+      <p v-else-if="keyword" class="el-select-dropdown__empty">{{ noDataText || '无匹配数据' }}</p>
       <p v-else class="el-select-dropdown__empty">{{ noDataText || '无数据' }}</p>
     </template>
   </el-select>
@@ -34,7 +35,8 @@ import VirtualList from 'vue-virtual-scroll-list'
 import ElSelect2Item from './ElSelect2Item.vue'
 
 export default {
-  props: ['value', 'options', 'idKey', 'valueKey', 'labelKey', 'noDataText'],
+  inheritAttrs: false,
+  props: ['value', 'options', 'idKey', 'valueKey', 'labelKey', 'noDataText', 'noMatchText'],
   components: { 'virtual-list': VirtualList },
   data() {
     return {
@@ -46,7 +48,7 @@ export default {
     inheritProps() {
       const attr = this.$attrs
       const props = {}
-      const keys = ['size', 'clearable', 'filterable', 'disabled', 'name', 'autocomplete', 'placeholder']
+      const keys = ['size', 'clearable', 'filterable', 'disabled', 'name', 'autocomplete', 'placeholder', 'popper-append-to-body', 'popperAppendToBody']
       keys.forEach(key => {
         const value = this.$attrs[key]
         if (typeof value !== 'undefined') {
@@ -101,8 +103,18 @@ export default {
       this.$refs.select.blur()
     },
     onVisibleChange(val) {
-      this.keyword = ''
       this.$emit('visible-change', val)
+
+      if (val) {
+        this.$nextTick(() => {
+          this.keyword = ''
+        })
+      } else {
+        // fix: 有搜索值的情况下，失焦时会闪烁一下
+        setTimeout(() => {
+          this.keyword = ''
+        }, 100)
+      }
 
       if (!val) return
       const idx = this.list.findIndex(item => {

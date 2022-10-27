@@ -54,7 +54,7 @@ export default {
   components: { ElSelect2 },
   data() {
     return {
-      value: 100,
+      value: 99,
       size: 'medium',
       disabled: false,
       filterable: true,
@@ -63,7 +63,7 @@ export default {
   },
   created() {
     const options = []
-    for (let i = 1; i < 1000; i++) {
+    for (let i = 1; i < 100; i++) {
       if (i % 5 == 0) {
         options.push({ a: i, b: '王五' + i })
       } else if (i % 5 == 4) {
@@ -83,7 +83,7 @@ export default {
       this.value = n
     },
     onChange2(v) {
-      console.log('onChange2', v)
+      console.log('onChange2', JSON.stringify(v))
     }
   }
 }
