@@ -41,6 +41,8 @@
           :filterable="filterable"
           :disabled="disabled"
           @change="onChange2"
+          ref="select2"
+          automatic-dropdown
         />
       </el-form-item>
     </el-form>
@@ -54,16 +56,16 @@ export default {
   components: { ElSelect2 },
   data() {
     return {
-      value: 99,
+      value: 101,
       size: 'medium',
       disabled: false,
-      filterable: true,
+      filterable: false,
       options: []
     }
   },
   created() {
     const options = []
-    for (let i = 1; i < 100; i++) {
+    for (let i = 1; i <= 1000; i++) {
       if (i % 5 == 0) {
         options.push({ a: i, b: '王五' + i })
       } else if (i % 5 == 4) {
@@ -85,6 +87,12 @@ export default {
     onChange2(v) {
       console.log('onChange2', JSON.stringify(v))
     }
+  },
+  mounted() {
+    // TODO fix
+    // setTimeout(() => {
+    //   this.$refs.select2.focus()
+    // }, 1000)
   }
 }
 </script>

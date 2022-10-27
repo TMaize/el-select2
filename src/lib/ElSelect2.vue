@@ -12,7 +12,8 @@
       <virtual-list
         v-if="list.length > 0"
         ref="list"
-        style="height: 238px; overflow-y: auto"
+        style="max-height: 238px; overflow-y: auto; overflow-y: overlay"
+        class="el-select2-scroll"
         data-key="id"
         :data-sources="list"
         :data-component="itemComponent"
@@ -40,6 +41,7 @@ export default {
   components: { 'virtual-list': VirtualList },
   data() {
     return {
+      styleInjected: false,
       keyword: '',
       itemComponent: ElSelect2Item
     }
@@ -61,7 +63,7 @@ export default {
       return (this.keyword || '').toLowerCase()
     },
     list() {
-      const attr = this.$attrs // push 不触发computed重新计算，保证每次更新都触发计算 // TODO 优化
+      // console.time('list')
       const idKey = this.idKey
       const valueKey = this.valueKey || 'value'
       const labelKey = this.labelKey || 'label'
@@ -81,6 +83,7 @@ export default {
           list.push(item)
         }
       }
+      // console.timeEnd('list')
       return list
     },
     label: {
@@ -97,26 +100,56 @@ export default {
     }
   },
   methods: {
+    injectStyle() {
+      if (this.styleInjected) return
+      this.styleInjected = true
+      if (document.querySelector('#el-select2-style')) return
+      console.log('injectStyle')
+      const style = `
+        .el-select2-scroll::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+          background-color: transparent;
+        }
+        .el-select2-scroll::-webkit-scrollbar-thumb {
+          border-radius: 4px;
+          background-color: rgba(144,147,153,.3);
+        }
+        .el-select2-scroll::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(144,147,153,.5);
+        }
+        .el-select2-scroll .selected {
+          color: #409EFF;
+          font-weight: 700;
+        }
+        `
+      const styleNode = document.createElement('style')
+      styleNode.id = 'el-select2-style'
+      styleNode.appendChild(document.createTextNode(style))
+      document.head.appendChild(styleNode)
+    },
     onSelect(item) {
       this.$emit('input', item.value)
       this.$emit('change', item.value)
-      this.$refs.select.blur()
+      this.blur()
     },
     onVisibleChange(val) {
       this.$emit('visible-change', val)
 
-      if (val) {
-        this.$nextTick(() => {
-          this.keyword = ''
-        })
-      } else {
+      if (!val) {
         // fix: 有搜索值的情况下，失焦时会闪烁一下
         setTimeout(() => {
           this.keyword = ''
         }, 100)
+        return
       }
 
-      if (!val) return
+      this.$nextTick(() => {
+        this.keyword = ''
+
+        this.injectStyle()
+      })
+
       const idx = this.list.findIndex(item => {
         return item.value === this.value
       })
@@ -137,6 +170,13 @@ export default {
     },
     onFilter(kw) {
       this.keyword = kw || ''
+    },
+    focus() {
+      // TODO automatic-dropdown 属性bug
+      this.$refs.select.focus()
+    },
+    blur() {
+      this.$refs.select.blur()
     }
   }
 }

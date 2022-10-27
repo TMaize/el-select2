@@ -1,11 +1,14 @@
 <template>
-  <span @click="onClick" style="display: block; margin: 0px -20px; padding: 0px 20px">{{ source.label }}</span>
+  <span @click="onClick" style="display: block; margin: 0px -20px; padding: 0px 20px" :class="{ selected: value === source.value }">
+    {{ source.label }}
+  </span>
 </template>
 
 <script>
 export default {
   name: 'ElSelectItem',
   props: {
+    value: [String, Number],
     index: {
       type: Number
     },
