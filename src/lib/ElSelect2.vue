@@ -59,8 +59,9 @@ export default {
         'autocomplete',
         'placeholder',
         'popper-append-to-body',
-        'popperAppendToBody'
-        // 'automatic-dropdown'
+        'popperAppendToBody',
+        'automatic-dropdown',
+        'automaticDropdown'
       ]
       keys.forEach(key => {
         const value = this.$attrs[key]

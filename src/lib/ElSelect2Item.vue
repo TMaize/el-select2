@@ -8,7 +8,7 @@
 export default {
   name: 'ElSelectItem',
   props: {
-    value: [String, Number],
+    value: [String, Number, Array],
     index: {
       type: Number
     },

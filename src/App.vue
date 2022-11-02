@@ -30,7 +30,7 @@
     </el-form>
     <el-form inline :size="size" label-width="100px">
       <!-- <el-form-item label="el-select">
-        <el-select v-model="value" clearable :filterable="filterable" :disabled="disabled">
+        <el-select v-model="value" clearable :filterable="filterable" :disabled="disabled" ref="select">
           <el-option v-for="item in options" :key="item.a" :value="item.a" :label="item.b"></el-option>
         </el-select>
       </el-form-item> -->
@@ -71,16 +71,16 @@ export default {
   methods: {
     initData() {
       const options = []
-      for (let i = 1; i <= 5000; i++) {
+      for (let i = 1; i <= 10000; i++) {
+        let item = { a: i, b: '小明' + i }
         if (i % 5 == 0) {
-          options.push({ a: i, b: '王五' + i })
+          item = { a: i, b: '王五' + i }
         } else if (i % 5 == 4) {
-          options.push({ a: i, b: '李四' + i })
+          item = { a: i, b: '李四' + i }
         } else if (i % 5 == 3) {
-          options.push({ a: i, b: '张三' + i })
-        } else {
-          options.push({ a: i, b: '小明' + i })
+          item = { a: i, b: '张三' + i }
         }
+        options.push(Object.freeze(item))
       }
       this.options = options
     },
@@ -112,13 +112,6 @@ export default {
     onChange2(v) {
       console.log('onChange2', JSON.stringify(v))
     }
-  },
-  mounted() {
-    // TODO need fix
-    // automatic-dropdown 开启，聚焦展开后，通过点击外部区域失去焦点，再次点击Select展开时会闪烁
-    // setTimeout(() => {
-    //   this.$refs.select2.focus()
-    // }, 1000)
   }
 }
 </script>
