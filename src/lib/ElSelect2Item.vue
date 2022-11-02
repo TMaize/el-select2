@@ -1,6 +1,6 @@
 <template>
-  <span @click="onClick" style="display: block; margin: 0px -20px; padding: 0px 20px" :class="{ selected: value === source.value }">
-    {{ source.label }}
+  <span @click="onClick" style="display: block; margin: 0px -20px; padding: 0px 20px" :class="{ selected: value === source[valueKey || 'value'] }">
+    {{ source[labelKey || 'label'] }}
   </span>
 </template>
 
@@ -18,13 +18,20 @@ export default {
         return {}
       }
     },
+    labelKey: {
+      type: String
+    },
+    valueKey: {
+      type: String
+    },
     onSelect: {
       type: Function
     }
   },
   methods: {
     onClick() {
-      this.onSelect && this.onSelect(this.source)
+      if (!this.onSelect) return
+      this.onSelect(this.source[this.valueKey || 'value'])
     }
   }
 }

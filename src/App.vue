@@ -21,16 +21,19 @@
         </el-select>
       </el-form-item>
       <el-form-item label="操作">
-        <el-button @click="value = ''">清空</el-button>
-        <el-button @click="addItem">追加数据</el-button>
+        <el-button @click="handAction('emptyValue')">清空值</el-button>
+        <el-button @click="handAction('emptyData')">清空数据</el-button>
+        <el-button @click="handAction('resetData')">重置数据</el-button>
+        <el-button @click="handAction('unshiftData')">前追加数据</el-button>
+        <el-button @click="handAction('pushData')">后追加数据</el-button>
       </el-form-item>
     </el-form>
     <el-form inline :size="size" label-width="100px">
-      <el-form-item label="el-select">
+      <!-- <el-form-item label="el-select">
         <el-select v-model="value" clearable :filterable="filterable" :disabled="disabled">
           <el-option v-for="item in options" :key="item.a" :value="item.a" :label="item.b"></el-option>
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="el-select2">
         <el-select2
           v-model="value"
@@ -42,7 +45,6 @@
           :disabled="disabled"
           @change="onChange2"
           ref="select2"
-          automatic-dropdown
         />
       </el-form-item>
     </el-form>
@@ -64,32 +66,56 @@ export default {
     }
   },
   created() {
-    const options = []
-    for (let i = 1; i <= 1000; i++) {
-      if (i % 5 == 0) {
-        options.push({ a: i, b: '王五' + i })
-      } else if (i % 5 == 4) {
-        options.push({ a: i, b: '李四' + i })
-      } else if (i % 5 == 3) {
-        options.push({ a: i, b: '张三' + i })
-      } else {
-        options.push({ a: i, b: '小明' + i })
-      }
-    }
-    this.options = options
+    this.initData()
   },
   methods: {
-    addItem() {
+    initData() {
+      const options = []
+      for (let i = 1; i <= 5000; i++) {
+        if (i % 5 == 0) {
+          options.push({ a: i, b: '王五' + i })
+        } else if (i % 5 == 4) {
+          options.push({ a: i, b: '李四' + i })
+        } else if (i % 5 == 3) {
+          options.push({ a: i, b: '张三' + i })
+        } else {
+          options.push({ a: i, b: '小明' + i })
+        }
+      }
+      this.options = options
+    },
+    handAction(action) {
       const n = Date.now()
-      this.options.unshift({ a: n, b: '追加' + n })
-      this.value = n
+
+      switch (action) {
+        case 'emptyValue':
+          this.value = ''
+          break
+        case 'emptyData':
+          this.options = []
+          break
+        case 'resetData':
+          this.initData()
+          break
+        case 'unshiftData':
+          this.options.unshift({ a: n, b: '追加 🧧' + n })
+          this.value = n
+          break
+        case 'pushData':
+          this.options.push({ a: n, b: '追加 🧧' + n })
+          this.value = n
+          break
+        default:
+          break
+      }
     },
     onChange2(v) {
       console.log('onChange2', JSON.stringify(v))
     }
   },
   mounted() {
-    // TODO fix
+    // TODO need fix
+    // automatic-dropdown 开启，聚焦展开后，通过点击外部区域失去焦点，再次点击Select展开时会闪烁
     // setTimeout(() => {
     //   this.$refs.select2.focus()
     // }, 1000)

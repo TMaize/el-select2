@@ -14,7 +14,7 @@
         ref="list"
         style="max-height: 238px; overflow-y: auto; overflow-y: overlay"
         class="el-select2-scroll"
-        data-key="id"
+        :data-key="idKey || valueKey || 'id'"
         :data-sources="list"
         :data-component="itemComponent"
         :estimate-size="34"
@@ -22,7 +22,7 @@
         item-tag="li"
         wrap-class="el-select-dropdown__list"
         item-class="el-select-dropdown__item"
-        :extra-props="{ onSelect, value }"
+        :extra-props="{ onSelect, value, labelKey, valueKey }"
       />
       <slot name="empty" v-else-if="$slots.empty" />
       <p v-else-if="keyword" class="el-select-dropdown__empty">{{ noDataText || '无匹配数据' }}</p>
@@ -50,7 +50,18 @@ export default {
     inheritProps() {
       const attr = this.$attrs
       const props = {}
-      const keys = ['size', 'clearable', 'filterable', 'disabled', 'name', 'autocomplete', 'placeholder', 'popper-append-to-body', 'popperAppendToBody']
+      const keys = [
+        'size',
+        'clearable',
+        'filterable',
+        'disabled',
+        'name',
+        'autocomplete',
+        'placeholder',
+        'popper-append-to-body',
+        'popperAppendToBody'
+        // 'automatic-dropdown'
+      ]
       keys.forEach(key => {
         const value = this.$attrs[key]
         if (typeof value !== 'undefined') {
@@ -59,37 +70,33 @@ export default {
       })
       return props
     },
-    lowerCaseKeyword() {
-      return (this.keyword || '').toLowerCase()
-    },
     list() {
-      // console.time('list')
-      const idKey = this.idKey
-      const valueKey = this.valueKey || 'value'
-      const labelKey = this.labelKey || 'label'
-      const keyword = this.lowerCaseKeyword
+      const keyword = (this.keyword || '').toLowerCase()
 
       if (!Array.isArray(this.options)) return []
 
-      const list = []
-      for (let i = 0; i < this.options.length; i++) {
-        const option = this.options[i]
-        const item = { id: idKey ? option[idKey] : i, label: option[labelKey], value: option[valueKey] }
-        if (!keyword) {
-          list.push(item)
-          continue
-        }
-        if (String(item.label).toLowerCase().indexOf(keyword) !== -1) {
-          list.push(item)
-        }
+      const valueKey = this.valueKey || 'value'
+      const labelKey = this.labelKey || 'label'
+
+      if (keyword) {
+        // 不要重新生成 item 否则性能很差
+        // console.time('list')
+        const list = this.options.filter(item => {
+          const label = item[labelKey].toLowerCase()
+          return label.includes(keyword)
+        })
+        // console.timeEnd('list')
+        return list
       }
-      // console.timeEnd('list')
-      return list
+
+      return this.options
     },
     label: {
       get() {
-        const option = this.list.find(item => item.value === this.value)
-        if (option) return option.label
+        const valueKey = this.valueKey || 'value'
+        const labelKey = this.labelKey || 'label'
+        const option = this.options.find(item => item[valueKey] === this.value)
+        if (option) return option[labelKey]
         return this.value || ''
       },
       set(v) {
@@ -128,9 +135,9 @@ export default {
       styleNode.appendChild(document.createTextNode(style))
       document.head.appendChild(styleNode)
     },
-    onSelect(item) {
-      this.$emit('input', item.value)
-      this.$emit('change', item.value)
+    onSelect(value) {
+      this.$emit('input', value)
+      this.$emit('change', value)
       this.blur()
     },
     onVisibleChange(val) {
@@ -150,8 +157,9 @@ export default {
         this.injectStyle()
       })
 
-      const idx = this.list.findIndex(item => {
-        return item.value === this.value
+      const valueKey = this.valueKey || 'value'
+      const idx = this.options.findIndex(item => {
+        return item[valueKey] === this.value
       })
 
       if (this.$refs.list) {
@@ -172,7 +180,6 @@ export default {
       this.keyword = kw || ''
     },
     focus() {
-      // TODO automatic-dropdown 属性bug
       this.$refs.select.focus()
     },
     blur() {
@@ -181,6 +188,3 @@ export default {
   }
 }
 </script>
-
-<style>
-</style>
