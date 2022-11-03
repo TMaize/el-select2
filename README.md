@@ -18,6 +18,11 @@ import ElSelect2 from 'el-select2'
 <el-select2 v-model="value" :options="options" labelKey="b" valueKey="a" clearable :filterable="filterable" :disabled="disabled" />
 ```
 
+[demo](https://github.com/TMaize/el-select2/blob/master/src/App.vue)
+
+[umd demo](https://github.com/TMaize/el-select2/blob/master/public/umd-demo.html)
+
+
 ## Select Attributes
 
 - options 列表数据
