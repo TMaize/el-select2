@@ -1,8 +1,8 @@
 # el-select2
 
-support big amount data list
-
 [el-select](https://element.eleme.cn/#/zh-CN/component/select) 增强，大数据不再卡顿
+
+[查看演示 Demo](https://tmaize.github.io/el-select2/)
 
 ## Install
 
@@ -17,6 +17,7 @@ import ElSelect2 from 'el-select2'
 ```vue
 <el-select2 v-model="value" :options="options" labelKey="b" valueKey="a" clearable :filterable="filterable" :disabled="disabled" />
 ```
+## 示例代码
 
 [demo](https://github.com/TMaize/el-select2/blob/master/src/App.vue)
 
